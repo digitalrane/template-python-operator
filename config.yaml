@@ -1,0 +1,13 @@
+options:
+    example_string_config:
+        type: string
+        description: 'An example string configuration item'
+        default: ''
+    example_int_config:
+        type: int
+        description: 'An example integer configuration item'
+        default: 9001
+    example_boolean_config:
+        type: bool
+        description: 'An example boolean configuration item'
+        default: false

@@ -1,0 +1,19 @@
+name: ${metadata.package}
+summary: Describe your charm here
+maintainers:
+    - ${dev_name} <${dev_email}>
+description: |
+    A nice long description of what the product does and any
+    high level information about how the charm provides the product,
+    on which platform, etc.
+tags:
+    - misc
+series:
+    - bionic
+# -- example relations, delete if unneeded
+#requires:
+#    db:
+#        interface: mysql
+#provides:
+#    website:
+#        interface: http
