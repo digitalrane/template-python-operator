@@ -1,5 +1,7 @@
-${friendly_name}
-----------------
+# ${friendly_name} Charm
+
+Overview
+--------
 
 Provide your product pitch for this charm here.
 
