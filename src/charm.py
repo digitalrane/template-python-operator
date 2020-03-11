@@ -6,10 +6,13 @@
 #
 # Distributed under terms of the GPL license.
 """Operator Charm main library."""
+# Load modules from $CHARM_DIR/lib
+import sys
+sys.path.append('lib')
 
-from ops.charm import CharmBase
-from ops.framework import StoredState
-from ops.model import (
+from ops.charm import CharmBase  # noqa:E402
+from ops.framework import StoredState  # noqa:E402
+from ops.model import (  # noqa:E402
     ActiveStatus,
     BlockedStatus,
     MaintenanceStatus
