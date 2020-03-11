@@ -6,7 +6,7 @@
 #
 # Distributed under terms of the GPL license.
 """Operator Charm main library."""
-# Load modules from $CHARM_DIR/lib
+# Load modules from lib directory
 import sys
 sys.path.append('lib')
 
