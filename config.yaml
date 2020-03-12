@@ -8,6 +8,6 @@ options:
         description: 'An example integer configuration item'
         default: 9001
     example_boolean_config:
-        type: bool
+        type: boolean
         description: 'An example boolean configuration item'
         default: false
