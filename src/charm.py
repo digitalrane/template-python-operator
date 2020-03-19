@@ -111,4 +111,4 @@ class ${class}(CharmBase):
 
 
 if __name__ == "__main__":
-    main(CloudstatsCharm)
+    main(${class})
