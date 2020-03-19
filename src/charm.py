@@ -12,6 +12,7 @@ sys.path.append('lib')
 
 from ops.charm import CharmBase  # noqa:E402
 from ops.framework import StoredState  # noqa:E402
+from ops.main import main  # noqa:E402
 from ops.model import (  # noqa:E402
     ActiveStatus,
     BlockedStatus,
