@@ -10,6 +10,7 @@ tags:
     - misc
 series:
     - bionic
+    - xenial
 # -- example relations, delete if unneeded
 #requires:
 #    db:
