@@ -9,13 +9,12 @@
 # Load modules from lib directory
 import logging
 
-import setuppath
+import setuppath  # noqa:F401
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
 from ops.model import (
     ActiveStatus,
-    BlockedStatus,
     MaintenanceStatus
 )
 
