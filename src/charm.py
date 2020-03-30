@@ -13,16 +13,7 @@ import setuppath  # noqa:F401
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
-from ops.model import (
-    ActiveStatus,
-    MaintenanceStatus
-)
-
-""" -- Example relation interface for MySQL:
-from interfaces import (
-    MySQLInterfaceRequires
-)
-"""
+from ops.model import ActiveStatus, MaintenanceStatus
 
 
 class ${class}(CharmBase):
@@ -41,11 +32,6 @@ class ${class}(CharmBase):
         self.state.set_default(installed=False)
         self.state.set_default(configured=False)
         self.state.set_default(started=False)
-        # -- example action observation
-        # self.framework.observe(self.on.example_action, self)
-        # -- example relation / interface observation, disabled by default
-        # self.framework.observe(self.on.db_relation_changed, self)
-        # self.mysql = MySQLInterfaceRequires(self, 'db')
 
     def on_install(self, event):
         """Handle install state."""
@@ -61,7 +47,9 @@ class ${class}(CharmBase):
         if not self.state.installed:
             logging.warning("Config changed called before install complete, deferring event: {}.".format(event.handle))
             self._defer_once(event)
+
             return
+
         if self.state.started:
             # Stop if necessary for reconfig
             logging.info("Stopping for configuration, event handle: {}".format(event.handle))
@@ -71,9 +59,11 @@ class ${class}(CharmBase):
 
     def on_start(self, event):
         """Handle start state."""
+
         if not self.state.configured:
             logging.warning("Start called before configuration complete, deferring event: {}".format(event.handle))
             self._defer_once(event)
+
             return
         self.unit.status = MaintenanceStatus("Starting charm software")
         # Start software
@@ -85,29 +75,17 @@ class ${class}(CharmBase):
         """Defer the given event, but only once."""
         notice_count = 0
         handle = str(event.handle)
+
         for event_path, _, _ in self.framework._storage.notices(None):
             if event_path.startswith(handle.split('[')[0]):
                 notice_count += 1
                 logging.debug("Found event: {} x {}".format(event_path, notice_count))
+
         if notice_count > 1:
             logging.debug("Not deferring {} notice count of {}".format(handle, notice_count))
         else:
             logging.debug("Deferring {} notice count of {}".format(handle, notice_count))
             event.defer()
-
-    # -- Example relation interface for MySQL, not observed by default:
-    # def on_db_relation_changed(self, event):
-    #     """Handle an example db relation's change event."""
-    #     self.password = event.relation.data[event.unit].get("password")
-    #     self.unit.status = MaintenanceStatus("Configuring database")
-    #     if self.mysql.is_ready:
-    #         event.log("Database relation complete")
-    #     self.state._db_configured = True
-
-    # def on_example_action(self, event):
-    #     """Handle the example_action action."""
-    #     event.log("Hello from the example action.")
-    #     event.set_results({"success": "true"})
 
 
 if __name__ == "__main__":
