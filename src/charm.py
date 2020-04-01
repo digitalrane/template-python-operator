@@ -7,23 +7,13 @@
 # Distributed under terms of the GPL license.
 """Operator Charm main library."""
 # Load modules from lib directory
-import sys
-sys.path.append('lib')
+import logging
 
-from ops.charm import CharmBase  # noqa:E402
-from ops.framework import StoredState  # noqa:E402
-from ops.main import main  # noqa:E402
-from ops.model import (  # noqa:E402
-    ActiveStatus,
-    BlockedStatus,
-    MaintenanceStatus
-)
-
-""" -- Example relation interface for MySQL:
-from interfaces import (
-    MySQLInterfaceRequires
-)
-"""
+import setuppath  # noqa:F401
+from ops.charm import CharmBase
+from ops.framework import StoredState
+from ops.main import main
+from ops.model import ActiveStatus, MaintenanceStatus
 
 
 class ${class}(CharmBase):
@@ -42,73 +32,60 @@ class ${class}(CharmBase):
         self.state.set_default(installed=False)
         self.state.set_default(configured=False)
         self.state.set_default(started=False)
-        # -- example action observation
-        # self.framework.observe(self.on.example_action, self)
-        # -- example relation / interface observation, disabled by default
-        # self.framework.observe(self.on.db_relation_changed, self)
-        # self.mysql = MySQLInterfaceRequires(self, 'db')
 
     def on_install(self, event):
         """Handle install state."""
         self.unit.status = MaintenanceStatus("Installing charm software")
         # Perform install tasks
         self.unit.status = MaintenanceStatus("Install complete")
-        self.model._backend.juju_log("INFO", "Install of software complete")
+        logging.info("Install of software complete")
         self.state.installed = True
 
     def on_config_changed(self, event):
         """Handle config changed."""
 
         if not self.state.installed:
-            self.model._backend.juju_log(
-                "ERROR", "Config changed called before install complete."
-            )
-            self.unit.status = MaintenanceStatus(
-                "Install not completed, not configuring."
-            )
+            logging.warning("Config changed called before install complete, deferring event: {}.".format(event.handle))
+            self._defer_once(event)
 
             return
 
         if self.state.started:
             # Stop if necessary for reconfig
-            self.model._backend.juju_log("INFO", "Stopping for configuration")
-            pass
+            logging.info("Stopping for configuration, event handle: {}".format(event.handle))
         # Configure the software
-        self.model._backend.juju_log("INFO", "Configuring")
+        logging.info("Configuring")
         self.state.configured = True
 
     def on_start(self, event):
         """Handle start state."""
 
         if not self.state.configured:
-            self.model._backend.juju_log(
-                "ERROR", "Install called before configuration complete."
-            )
-
-            self.unit.status = MaintenanceStatus(
-                "Configure not completed, not starting."
-            )
+            logging.warning("Start called before configuration complete, deferring event: {}".format(event.handle))
+            self._defer_once(event)
 
             return
-
         self.unit.status = MaintenanceStatus("Starting charm software")
         # Start software
         self.unit.status = ActiveStatus("Unit is ready")
         self.state.started = True
+        logging.info("Started")
 
-    # -- Example relation interface for MySQL, not observed by default:
-    # def on_db_relation_changed(self, event):
-    #     """Handle an example db relation's change event."""
-    #     self.password = event.relation.data[event.unit].get("password")
-    #     self.unit.status = MaintenanceStatus("Configuring database")
-    #     if self.mysql.is_ready:
-    #         event.log("Database relation complete")
-    #     self.state._db_configured = True
+    def _defer_once(self, event):
+        """Defer the given event, but only once."""
+        notice_count = 0
+        handle = str(event.handle)
 
-    # def on_example_action(self, event):
-    #     """Handle the example_action action."""
-    #     event.log("Hello from the example action.")
-    #     event.set_results({"success": "true"})
+        for event_path, _, _ in self.framework._storage.notices(None):
+            if event_path.startswith(handle.split('[')[0]):
+                notice_count += 1
+                logging.debug("Found event: {} x {}".format(event_path, notice_count))
+
+        if notice_count > 1:
+            logging.debug("Not deferring {} notice count of {}".format(handle, notice_count))
+        else:
+            logging.debug("Deferring {} notice count of {}".format(handle, notice_count))
+            event.defer()
 
 
 if __name__ == "__main__":
