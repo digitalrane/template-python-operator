@@ -3,8 +3,7 @@
 # vim:fenc=utf-8
 #
 # Copyright © ${year} ${dev_name} ${dev_email}
-#
-# Distributed under terms of the GPL license.
+
 """Operator Charm main library."""
 # Load modules from lib directory
 import sys
