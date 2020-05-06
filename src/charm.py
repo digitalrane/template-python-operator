@@ -80,3 +80,7 @@ class ${class}(CharmBase):
         """Handle the example_action action."""
         event.log("Hello from the example action.")
         event.set_results({"success": "true"})
+
+if __name__ == "__main__":
+    from ops.main import main
+    main(${class})
