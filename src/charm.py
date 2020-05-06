@@ -87,6 +87,21 @@ class ${class}(CharmBase):
             logging.debug("Deferring {} notice count of {}".format(handle, notice_count))
             event.defer()
 
+    # -- Example relation interface for MySQL, not observed by default:
+    def on_db_relation_changed(self, event):
+        """Handle an example db relation's change event."""
+        self.password = event.relation.data[event.unit].get("password")
+        self.unit.status = MaintenanceStatus("Configuring database")
+        if self.mysql.is_ready:
+            event.log("Database relation complete")
+        self.state._db_configured = True
+
+    def on_example_action(self, event):
+        """Handle the example_action action."""
+        event.log("Hello from the example action.")
+        event.set_results({"success": "true"})
+
 
 if __name__ == "__main__":
+    from ops.main import main
     main(${class})
